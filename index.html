@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
+  <title>LUCENT CLUB - Study Portal</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      background-color: #0d1117;
+      color: #f0f6fc;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Fixed Watermark */
+    .watermark {
+      position: fixed;
+      bottom: 12px;
+      right: 16px;
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(245, 158, 11, 0.45);
+      pointer-events: none;
+      z-index: 999;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+    }
+
+    /* =========================================================
+       WELCOME / INTRODUCTION MODAL PROMPT
+       ========================================================= */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .modal-card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 14px;
+      max-width: 680px;
+      width: 100%;
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9), 0 0 20px rgba(88, 166, 255, 0.2);
+      overflow: hidden;
+    }
+
+    .modal-header {
+      background: #090d13;
+      padding: 14px 18px;
+      border-bottom: 1px solid #30363d;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h2 {
+      font-size: 17px;
+      color: #58a6ff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-close-icon {
+      background: #21262d;
+      border: 1px solid #30363d;
+      color: #8b949e;
+      border-radius: 6px;
+      font-size: 16px;
+      padding: 4px 10px;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .modal-close-icon:hover {
+      color: #f0f6fc;
+      background: #30363d;
+    }
+
+    .modal-body {
+      padding: 20px;
+      overflow-y: auto;
+      font-size: 14px;
+      line-height: 1.65;
+      color: #c9d1d9;
+    }
+
+    .modal-body h3 {
+      font-size: 16px;
+      color: #f0f6fc;
+      margin: 16px 0 8px 0;
+      border-bottom: 1px solid #21262d;
+      padding-bottom: 4px;
+    }
+
+    .modal-body p {
+      margin-bottom: 10px;
+    }
+
+    .modal-body ul {
+      margin-left: 20px;
+      margin-bottom: 12px;
+    }
+
+    .modal-body li {
+      margin-bottom: 6px;
+    }
+
+    .modal-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      background: #0d1117;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid #30363d;
+    }
+
+    .modal-table th, .modal-table td {
+      padding: 10px 14px;
+      border: 1px solid #21262d;
+      text-align: left;
+    }
+
+    .modal-table th {
+      background: #1f2937;
+      color: #58a6ff;
+      font-weight: 600;
+    }
+
+    .modal-divider {
+      border: none;
+      height: 1px;
+      background: #30363d;
+      margin: 18px 0;
+    }
+
+    .highlight-box {
+      background: #0d1117;
+      border-left: 4px solid #f59e0b;
+      padding: 10px 14px;
+      border-radius: 4px;
+      margin: 12px 0;
+    }
+
+    .modal-footer {
+      background: #090d13;
+      padding: 12px 18px;
+      border-top: 1px solid #30363d;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .btn-agree {
+      background: #238636;
+      color: #ffffff;
+      border: none;
+      padding: 10px 22px;
+      font-size: 14px;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+
+    .btn-agree:hover {
+      background: #2ea043;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    /* =========================================================
+       TOP STICKY PDF VIEWER (65vh, FULL WIDTH)
+       ========================================================= */
+    .viewer-wrapper {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      height: 65vh;
+      background-color: #161b22;
+      border-bottom: 2px solid #30363d;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+    }
+
+    .viewer-header {
+      padding: 6px 14px;
+      background: #090d13;
+      font-size: 12.5px;
+      color: #58a6ff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #21262d;
+      flex-shrink: 0;
+    }
+
+    .zoom-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .zoom-btn {
+      background: #21262d;
+      border: 1px solid #30363d;
+      color: #c9d1d9;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .zoom-btn:hover {
+      background: #30363d;
+      color: #58a6ff;
+    }
+
+    .zoom-level {
+      font-size: 11px;
+      color: #8b949e;
+      min-width: 38px;
+      text-align: center;
+    }
+
+    .iframe-container {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      background: #0d1117;
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    .zoomable-layer {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform-origin: 0 0;
+      will-change: transform;
+    }
+
+    iframe {
+      width: 100%;
+      max-width: 100%;
+      height: 100%;
+      border: none;
+      pointer-events: auto;
+    }
+
+    .touch-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      display: none;
+    }
+
+    .placeholder-text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #8b949e;
+      font-size: 13.5px;
+      text-align: center;
+      padding: 20px;
+      z-index: 2;
+    }
+
+    .protection-shield {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 60px;
+      height: 60px;
+      z-index: 10;
+      background: transparent;
+    }
+
+    /* =========================================================
+       BOTTOM SETS AREA (COMPACT)
+       ========================================================= */
+    .content-area {
+      flex: 1;
+      padding: 12px 12px 50px 12px;
+      max-width: 640px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #f0f6fc;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .set-accordion {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .set-card {
+      background-color: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      overflow: hidden;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .set-card.active {
+      border-color: #58a6ff;
+      box-shadow: 0 0 8px rgba(88, 166, 255, 0.2);
+    }
+
+    .set-header {
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .set-header:hover {
+      background: #21262d;
+    }
+
+    .set-index {
+      font-size: 14px;
+      font-weight: 600;
+      color: #6e7681;
+      font-variant-numeric: tabular-nums;
+      min-width: 30px;
+    }
+
+    .set-card.active .set-index {
+      color: #58a6ff;
+    }
+
+    .set-name {
+      flex: 1;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #e6edf3;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .set-icon {
+      font-size: 11px;
+      color: #8b949e;
+      transition: transform 0.3s ease;
+    }
+
+    .set-card.active .set-icon {
+      transform: rotate(180deg);
+      color: #58a6ff;
+    }
+
+    .set-dropdown {
+      display: none;
+      background: #0d1117;
+      border-top: 1px solid #21262d;
+      padding: 6px 8px;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .set-card.active .set-dropdown {
+      display: flex;
+    }
+
+    .doc-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      background: #161b22;
+      border: 1px solid #21262d;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #c9d1d9;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .doc-link:hover {
+      background: #21262d;
+      color: #58a6ff;
+      border-color: #388bfd33;
+    }
+
+    .doc-link.active-item {
+      background: #1f2937;
+      border-color: #58a6ff;
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .badge {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .badge-hw { background: #238636; color: #ffffff; }
+    .badge-ts { background: #8957e5; color: #ffffff; }
+    .badge-sol { background: #d29922; color: #ffffff; }
+
+    @media print {
+      body { display: none !important; }
+    }
+  </style>
+</head>
+<body oncontextmenu="return false;">
+
+  <!-- Prompt Modal on Page Open -->
+  <div class="modal-overlay" id="welcomeModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2>📚 LUCENT CLUB</h2>
+        <button class="modal-close-icon" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <h3 style="color: #58a6ff; border: none; font-size: 17px; margin-top:0;">🎯 Lucent Practice Set — Introduction</h3>
+        
+        <h3 style="color: #e6edf3;">📝 1. Lucent Practice Set की मुख्य विशेषताएँ</h3>
+        <p>📌 नवीनतम पाठ्यक्रम एवं परीक्षा पैटर्न पर आधारित महत्वपूर्ण प्रश्न।</p>
+        <p>📖 Lucent’s सामान्य ज्ञान (Subjective) के टॉपिक-वाइज निचोड़ से तैयार किए गए MCQ।</p>
+        <p>🎯 Lucent’s सामान्य ज्ञान के प्रत्येक टॉपिक से प्रश्नों को एक विशेष प्रश्न-शृंखला के रूप में तैयार किया गया है।</p>
+        <p>📅 <strong>Daily Lucent Practice:</strong> हर दिन Lucent’s सामान्य ज्ञान के 4–6 टॉपिक से मिलाकर 1 Practice Set अपलोड किया गया है।</p>
+
+        <hr class="modal-divider">
+
+        <h3 style="color: #e6edf3;">⏰ 📅 Set Upload Time-Table</h3>
+        <table class="modal-table">
+          <thead>
+            <tr>
+              <th>📚 Activity</th>
+              <th>⏰ Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>📝 Homework</td>
+              <td>Daily Scheduled</td>
+            </tr>
+            <tr>
+              <td>🎯 Set Practice</td>
+              <td>Daily Scheduled</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <hr class="modal-divider">
+
+        <h3 style="color: #e6edf3;">📖 2. How to Read Lucent Book</h3>
+        <p style="color: #f59e0b; font-weight:600;">🚀 7 सबसे असरदार और Advanced Level Smart Study Tricks</p>
+
+        <p><strong>1️⃣ 🔦 Highlight → ज़रूरी चीज़ों पर फोकस करें</strong><br>
+        <em>क्या करें?</em><br>
+        🔹 पूरी लाइन को Highlight न करें।<br>
+        🔹 सिर्फ Dates, Names, Definitions, Numbers और Important Facts को Highlight करें।<br>
+        🔹 दोबारा पढ़ते समय केवल Highlight की हुई जरूरी चीज़ें दिखाई देंगी।<br>
+        ⚠️ <em>एक बार में जरूरत जितना ही Highlight करें, वरना पूरी किताब पीली दिखाई देगी! 😄</em></p>
+
+        <hr class="modal-divider">
+
+        <p><strong>2️⃣ 📖 Read → पहली बार समझकर पढ़ें</strong><br>
+        <em>क्या करें?</em><br>
+        🔹 धीरे-धीरे पढ़ें और हर Paragraph के बाद खुद से पूछें:<br>
+        💭 <em>"मैंने अभी क्या पढ़ा?"</em><br>
+        🧠 इससे दिमाग Active रहेगा और याददाश्त मजबूत होगी।</p>
+
+        <hr class="modal-divider">
+
+        <p><strong>3️⃣ 🔄 Interleaving → अलग-अलग विषयों को मिलाकर पढ़ें</strong><br>
+        <em>क्या करें?</em><br>
+        ❌ एक ही विषय को लगातार घंटों तक न पढ़ें।<br>
+        ✅ उदाहरण:<br>
+        🕐 30 मिनट — इतिहास<br>
+        🕐 30 मिनट — विज्ञान<br>
+        🕐 30 मिनट — विविध<br>
+        🔄 इससे दिमाग लगातार Switch करता रहता है और पढ़ाई में ऊब कम होती है, जिससे चीज़ें बेहतर याद रहती हैं।</p>
+
+        <hr class="modal-divider">
+
+        <p><strong>4️⃣ 👁️ Visual Learning → दिमाग "दृश्य" से तेज़ सीखता है</strong><br>
+        <em>क्या करें?</em><br>
+        🧠 Mind Maps बनाएं।<br>
+        📊 Flowcharts बनाएं।<br>
+        🖼️ Diagrams का उपयोग करें।<br>
+        🌍 भूगोल, 📜 इतिहास और 🔬 विज्ञान के Topics को Picture/Visual के रूप में सोचने की कोशिश करें।<br>
+        💡 हमारा मस्तिष्क केवल Text की तुलना में Images को अधिक प्रभावी ढंग से याद रख सकता है।</p>
+
+        <hr class="modal-divider">
+
+        <p><strong>5️⃣ ❤️ Emotion से जोड़ें → भावनाओं के साथ याद करें</strong><br>
+        🧠 दिमाग चीज़ों को भावनाओं और कहानियों से जोड़कर बेहतर याद रखता है।<br>
+        <em>क्या करें?</em><br>
+        🔹 हर Fact के साथ कोई मज़ेदार, डरावनी या Emotional कहानी/Association जोड़ें।<br>
+        📌 उदाहरण: 1857 का विद्रोह ➡️ मंगल पांडे की बहादुरी ➡️ क्रांति की चिंगारी 🔥<br>
+        🎯 इस तरह कोई घटना आपकी Memory में एक Strong Anchor बन जाती है।</p>
+
+        <hr class="modal-divider">
+
+        <p><strong>6️⃣ 🧪 Retrieval Practice → खुद से लगातार Test लें</strong><br>
+        <span style="color: #f59e0b; font-weight:700;">⭐ MOST IMPORTANT</span><br>
+        <em>क्या करें?</em><br>
+        📝 हर Topic पढ़ने के बाद उसी Topic का MCQ Set लगाएं।<br>
+        🎯 Practice ही Selection की पहली सीढ़ी है।<br>
+        📅 रोज़ एक Set = 🚶 सफलता की ओर एक कदम।<br>
+        📖 पढ़ना एक बार है, मगर Practice हर दिन है।<br>
+        💪 क्योंकि Selection सिर्फ पढ़ने से नहीं, लगातार Practice करने से होता है।<br>
+        🧠 जितना ज्यादा Practice करेंगे, उतनी ही Strong Memory बनेगी।</p>
+
+        <hr class="modal-divider">
+
+        <p><strong>7️⃣ 🔁 Revise → बार-बार दोहराना जरूरी है</strong><br>
+        📅 Revision Plan:<br>
+        🟢 Day 1 → पहली बार पढ़ें<br>
+        🔵 Day 2 → पहला Revision<br>
+        🟠 Day 7 → दूसरा Revision<br>
+        🔴 Day 15 → Final Revision<br>
+        💡 हर बार Revision में कम समय लगेगा और आपकी Memory और मजबूत होती जाएगी।</p>
+
+        <hr class="modal-divider">
+
+        <div class="highlight-box">
+          <h4 style="color: #fbbf24; margin-bottom: 6px;">🏆 याद रखें!</h4>
+          <p style="margin-bottom: 4px;"><strong>📚 Study + Practice + Revision = Selection</strong></p>
+          <p style="margin-bottom: 0;">🔥 रोज़ एक कदम आगे बढ़ें। • 🎯 रोज़ Practice करें। • 🧠 Smart तरीके से पढ़ें। • 🔁 नियमित Revision करें।</p>
+        </div>
+
+        <p style="text-align: center; color: #58a6ff; font-weight: 700; margin: 12px 0;">
+          ⚡ "पढ़ाई खुद की, Planning हमारी — ⚡ Powered by 𓊈 ꕶ𝐚𐍄ꪗ𝓪𝓂 𓊉 🚩<br>
+          यही है Self-Study CONTENT की असली ताकत!" 🚩
+        </p>
+
+        <p style="text-align: center; color: #f43f5e; font-weight: 700;">
+          ❤️ LUCENT CLUB<br>
+          <span style="color: #c9d1d9; font-weight: 500;">📚 पढ़ो • 📝 Practice करो • 🔁 Revise करो • 🏆 Select हो जाओ</span>
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-agree" onclick="closeModal()">🚀 समझ गया / Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Watermark -->
+  <div class="watermark">⚡ Powered by 𓊈 ꕶ𝐚𐍄ꪗ𝓪𝓂 𓊉 🚩</div>
+
+  <!-- Top Sticky PDF Viewer (65vh, Max Width with Pinch Zoom) -->
+  <div class="viewer-wrapper">
+    <div class="viewer-header">
+      <span id="viewingTitle">PDF Preview</span>
+      <div class="zoom-toolbar">
+        <button class="zoom-btn" id="btnZoomOut" title="Zoom Out">−</button>
+        <span class="zoom-level" id="zoomDisplay">100%</span>
+        <button class="zoom-btn" id="btnZoomIn" title="Zoom In">+</button>
+        <button class="zoom-btn" id="btnZoomReset" title="Reset Zoom">↺</button>
+      </div>
+    </div>
+    <div class="iframe-container" id="zoomViewport">
+      <div class="protection-shield"></div>
+      <div class="placeholder-text" id="placeholder">
+        नीचे दिए गए किसी भी सेट पर क्लिक करें और अध्ययन सामग्री लोड करें
+      </div>
+      <div class="zoomable-layer" id="zoomLayer">
+        <div class="touch-overlay" id="touchOverlay"></div>
+        <iframe id="pdfFrame" src="" style="display: none;"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content / Sets List (Compact) -->
+  <div class="content-area">
+    <div class="section-title">
+      <span>📚</span>
+      <span>LUCENT CLUB</span>
+    </div>
+
+    <div class="set-accordion" id="accordionContainer"></div>
+  </div>
+
+  <script>
+    // Close Welcome Modal
+    function closeModal() {
+      const modal = document.getElementById('welcomeModal');
+      modal.style.opacity = '0';
+      modal.style.transition = 'opacity 0.25s ease';
+      setTimeout(() => {
+        modal.style.display = 'none';
+      }, 250);
+    }
+
+    const setsData = [
+      { set: 1, hw: '14V4-BZJNW4RbhMGDATY1RovgCUAquO4H', ts: [['Test Series 1', '1_Fx7a2bfdnyyBrpfFRyHAOpGX1eBOmiZ']], sol: [['Solution 1', '1sXS3UTUp7mr8KX6JRTQclcZ3fP4RMigg']] },
+      { set: 2, hw: '1Y4fB3u-SzcB2jXrPHdgge7Pm5imiA7rx', ts: [['Test Series 2', '1cLTEvQFuH5FB_t0uTeMBaIXnf2EQU7Xy']], sol: [['Solution 2', '1KjCr0sPzR77z77-79BHQB9aOVFwllctC']] },
+      { set: 3, hw: '1ZUOAOJ6jtW9o92W_AUQ-8WH4u9J51ErK', ts: [['Test Series 3', '1GJGG37MV7NK_zUnacyM1j-pDh9s2Iw__']], sol: [['Solution 3', '11ipGT5AwpHZaxZVUvc60A42IWoUHGgwL']] },
+      { set: 4, hw: '1mpPJvV2uCOQep7rSg-AlzZSJ1AfGQHJk', ts: [['Test Series 4', '1Jl_wbcKyJRIkGpn-LQdVBO1LA4yioUPw']], sol: [['Solution 4', '1fD0DF-vXZKzyldDw3HW1CevGTeSjwjln']] },
+      { set: 5, hw: '19lR0OHMZYomE7DsY27-TY1al9q4GWfxf', ts: [['Test Series 5', '1mq0FA_rp-aiGLzp6SGYHM9ae2zl34-XX']], sol: [['Solution 5', '1yxvROABUDDlmXkT9Y5SoxsukS1ODHPw4']] },
+      { set: 6, hw: '1khSaFP0twrud0HcOnZ1m5FVrHTagNOY_', ts: [['Test Series 6', '17OZ-qlrGe12_nTepmj-hHCT5y9oz2eh0']], sol: [['Solution 6', '1JIClTkBcTsDmmGo3GwHCbgw_AaU0fFh5']] },
+      { set: 7, hw: '1xXmmNksZ58CLnBxrsmQLxhm90c6Y8dTj', ts: [['Test Series 7', '1OEfMhRW6Or9T-1lp4Dp0SlTFiTreQ5vL']], sol: [['Solution 7', '1d7TiWQeQkozOh17GHJAHCIqusZcdXnxa']] },
+      { set: 8, hw: '1onEqUQYiVmSrZk7NGwEHfbbVRogUCIYO', ts: [['Test Series 8', '1lzY2e59SO-nb4uLzEWtfM8EgjW7Loazo']], sol: [['Solution 8', '1a4_8hiPtu8YiHSC0ctWj38RwBR_UbxPW']] },
+      { set: 9, hw: '1HawRWaUGlFl-6weXTrciDFmxj-tvpCuS', ts: [['Test Series 9', '126pjhGSCK2KEu1L_2_ch_G7LbpEtbQ9i']], sol: [['Solution 9', '1Vj_uEdAOp3OBmdAJOfQbNLKHLAr_gD_h']] },
+      { set: 10, hw: '1cCiodKr_AvE4-eBN_gVxQVDboXpofJR6', ts: [['Test Series 10', '14W_bb5FR6Ltz5oe7IEiOxVVAIlksUNn4']], sol: [['Solution 10', '1PH9Wwe_P65fgGx9-KS221UfMYiaN9HKV']] },
+      { set: 11, hw: '1QtUPT8rzEukrZE4FTvABUpniwoB5CdQJ', ts: [['Test Series 11A', '19bwJyD4zhlLSadY99Z11StvaQp4bei-h'], ['Test Series 11B', '1MSi-Aiazo3olJvIdNpGHA16HSn3K2Dac'], ['Test Series 11C', '1ysObbcVqZXV7QY79-jMiN_omskQWc0yW']], sol: [['Solution 11A', '1I429wXCJY31wtYycc1tTiq8EpW_Uz9Jm'], ['Solution 11B', '1kJmHHAwJZ-wo75gTsBCMpL7k6oZIg1N-'], ['Solution 11C', '1fXj5h47igF0NELjkzQtjzCpPPW51DZN-']] },
+      { set: 12, hw: '1ciwMKvSd18ZMhm2SeFvPc2vvCoSbhA1U', ts: [['Test Series 12A', '128wGz1rGV2f7T5DqDwU7Q966_VVV6xtu'], ['Test Series 12B', '14oBo1MS4MBL7jQ9RsysSOmx2KHlOKmIb'], ['Test Series 12C', '16bsFdYOn8ARsHRXc0uNOhbgpnKXwyksn']], sol: [['Solution 12A', '1gkJK8C8o3lsmCwpWhN7j8pPJIpCwS4XN'], ['Solution 12B', '1kKs6Y3znUP-6d9ptuWYv7cwd8KTLKHQV'], ['Solution 12C', '1beC6N-nimBTis9-6Q87tjJHhH0KUnLR7']] },
+      { set: 13, hw: '1CY5Fb_jRZJp613oLf6LdHCnOxJ-OrzvL', ts: [['Test Series 13A', '1iOGsqtgnDpkicCfz9x4IPK4aSfKeFc0_'], ['Test Series 13B', '12szb2mk6ivIeT7mdUig9keTVCSplHrwL'], ['Test Series 13C', '1jU4C6pLm3C_nOHHw9kIP4HrXWozPrSsJ']], sol: [['Solution 13A', '1AE3c7U3hExc8NnDOPEAh6gJ4Nrt-UPQ9'], ['Solution 13B', '1fpUvFjiMSWUYASEJxbO9UJo8r1opr59n'], ['Solution 13C', '1dczjqNj7umBGkiuTn3nqIVqDIAipcwV9']] },
+      { set: 14, hw: '1hxvR_g8u604mJxYfxxb_ofFWudi554dx', ts: [['Test Series 14A', '1EaS3y6hvTIS8LQViY6jgDkBg_BH6OP-f'], ['Test Series 14B', '1Oyt_rcG0PoBg3WFw0qbj9YMpsK4fzvmN'], ['Test Series 14C', '1EMBuUZUMzJ_pgFH1-ZRCNg15XsJqdzry']], sol: [['Solution 14A', '18ru9CPAty5i0i9tbECW2D0GcBmubdVc-'], ['Solution 14B', '1A-M4yKlXz5rFR1d4kEBmCF_5mVVdhxuJ'], ['Solution 14C', '1rbmDwTZWH0GbmH8SKsWkWNITDUg5KQ4O']] },
+      { set: 15, hw: '1mcIjc6fR2RiGU3PfxFl8i0A163boHvoR', ts: [['Test Series 15A', '1RIZ278YIYJDcxNLKUtxIapbZB6U5aynF'], ['Test Series 15B', '10_QgqPIK-jTIlWbgLghjmkg4Z1Z4jXdm'], ['Test Series 15C', '1Ms1jLUTuYO1j2siLMZnugQBIzBNBO1gI']], sol: [['Solution 15A', '1H3aDbM1geSWeaYGywGU__yUhSDwP7tgF'], ['Solution 15B', '19G7WHRn0QsP8-6dE8KXU-4mEN76BrAKh'], ['Solution 15C', '1fWQq6AXt9zBJcmjAllxI3J4FiFNAJa6u']] },
+      { set: 16, hw: '1RWGemSJHjgXqeqOywe9-GR_i2A5oWBQQ', ts: [['Test Series 16A', '1aNh1Q0IV4J9_R6qplFa85qFB0gXWyOoJ'], ['Test Series 16B', '1FwR8uhEjdpmvIz1aLKbSh2jPh8pcVyUP'], ['Test Series 16C', '1bSf-sjTAy5zW7UfE2hC5cxwZCYRbdG31']], sol: [['Solution 16A', '1sELCT8rODk-z32u0lvipc_9HLZeQyEb4'], ['Solution 16B', '189Bh_6BALOdkw49FNRkDI4eAvOc8-pCF'], ['Solution 16C', '1tRKAarof3oHlv9Y-bE5ghLeTQ849TwEl']] },
+      { set: 17, hw: '1b-jOABXJpOEF6MYZJXn-bf1erWCN8TJo', ts: [['Test Series 17A', '1NWYPdHcUlXsm_Bz4KIKaSZgLeR7DJ_ea'], ['Test Series 17B', '15IQvykIbwJcZlxWQJU5baCpmYdezJI0v'], ['Test Series 17C', '1Y3TF1Qiix3HRplTLTP-sQ6a-OhX2q62W']], sol: [['Solution 17A', '1Wz_iLiMS6iDT01dWS9-kqR-ZGHtsLHPT'], ['Solution 17B', '13Wx-bgFo5EKdorjOUuwmxDYQW-VR7btg'], ['Solution 17C', '1Fd1ucUR0jVkjE9lb11j3YI1iMwFGuu0K']] },
+      { set: 18, hw: '14pscw9E6mEsRwNa2SR6vxmWTz4ab-Snr', ts: [['Test Series 18A', '1WxHicoHEW4St-Mc7vqUdSKZFKC3myvmg'], ['Test Series 18B', '1JpldgisMAduocS17ktBfZBz5bZCgYm2G'], ['Test Series 18C', '1K-lZM6ekynLkQ_oyxiF9yctZG_HFENNf']], sol: [['Solution 18A', '1RhjqBqyRo8xCVcGA4h5vjv6z_HmI9ZMb'], ['Solution 18B', '1O0tD7I2lPG8WwfqjN-2Q9WFItc9zUTJS'], ['Solution 18C', '1O3U29O4lJuvpVGDuGfc3E4Q12R_tHYMO']] },
+      { set: 19, hw: '1GMjgXbc0u0QRAnyqE7NuoNh2CbtAczx4', ts: [['Test Series 19A', '15B_xJThPn-chyViYCnQopsFTgtnBwJuD'], ['Test Series 19B', '1wFT9KhHrGI7CTY7eyUXmrZGrdM0S-kFT'], ['Test Series 19C', '1OmFtor-bRRF7ivlDZV93GWI-rZap6vRY']], sol: [['Solution 19A', '1zoytuNNd_7rvLJdEwulAyjQauKJILkHZ'], ['Solution 19B', '1wUPXIYmFmSwlDThM9yvRMMYz-Uwnx5HA'], ['Solution 19C', '1HEgp21II5_VvZdfydpTLhRcwIzxiI-79']] },
+      { set: 20, hw: '1WgI140CCC4qw8h0EQjGvvJNYfbi6lF_8', ts: [['Test Series 20A', '1K961X53d3iI3Q2o_XOgeJkHcwYvk0X-e'], ['Test Series 20B', '1X9xe8MZW3eQ-Q-BDtOo0D7i-GaRigc_0'], ['Test Series 20C', '1wt3pKU4-5eCo1FvxbODX4hH17VlHaU1-']], sol: [['Solution 20A', '1_2u6q53GKz8q20A-1sFF1GPr91loc9jz'], ['Solution 20B', '1sb4kEgp0ckWOdG1qeZCzWpGJwbd5TM_e'], ['Solution 20C', '1vq8JY5x9CTxd5iWIarf3txN7aYsyMx8p']] },
+      { set: 21, hw: '1sphlt0rvaZQxvjLVIlQ6GJYTwPABRYrr', ts: [['Test Series 21A', '15rRt9O7hnLPX5rIt7oSHxFRzjrg-pyRp'], ['Test Series 21B', '1PjQng4SaYGm9Xg3GsNTQcgjH8Ui1T3z7'], ['Test Series 21C', '1wQjSwqhDJoohwtwn3zW8a28NReCeX9tm']], sol: [['Solution 21A', '1pOjnjIqjiXN6aPr3-jYTQpLDk4EwHF7u'], ['Solution 21B', '19gYSgNh0t41iT7MF9ZTD4mY3GWg-pto7'], ['Solution 21C', '14wj0BG-hcvI6Lti3D0zRlqOjwgbOHmxk']] },
+      { set: 22, hw: '1qJUScjN7RHK9GGN_HqyqzU_3RCk-l7H3', ts: [['Test Series 22A', '1dwI5EIZ4-HYUqPpHgY25bFaKlesfzXfH'], ['Test Series 22B', '1QfIjejFxj2rh9MF1Bl2v23Fk7gJ1YfIn'], ['Test Series 22C', '1Eh6lXPJsS8anPmP3qFqkPXmah5D4vimZ']], sol: [['Solution 22A', '10693QvV2wXkNiBoBTg_i8ea5BzH2aRKM'], ['Solution 22B', '17il_x9I2sTF6FsfQ9YCg0yBtu2HsgsXB'], ['Solution 22C', '1bTMsqj9Y9x6Pcaa__qrVgZy6aer860v9']] },
+      { set: 23, hw: '1E5EH7Uw6ONfMuTrKcxx83w7f7SE2g1T1', ts: [['Test Series 23A', '1n_CWIYtFZzpjXDvt9xPy3QE7UqnUOMLq'], ['Test Series 23B', '1HQGuYOoI4wMYDMneMC_rTZosMiZXd9Hw'], ['Test Series 23C', '1JUtgf49Pb-SlXJ-Ws49qitsTKgrXtC46']], sol: [['Solution 23B', '1Oe0v6b0b_HYbyrukfw24AFs5qPDosVLT'], ['Solution 23C', '1qCaS05eP9kNXrY9mIb9DoD4wZB2Pi2lq']] },
+      { set: 24, hw: '1T--HzFLxqWQizNVKd0R_jjYdRcyWclbX', ts: [['Test Series 24A', '1pl9I19g_vxDxHKKQ6PIhki1QAOts98s6'], ['Test Series 24B', '1YLDRsz7e45Tdn-1MZDjv30UUtNUEa800'], ['Test Series 24C', '1ZE5YJ7ptWHatbrhAr_AsDGWxfgFj9LPi']], sol: [['Solution 24A', '18iMXk-QvKbZc6ALzmB79rXT3Skr-Iir3'], ['Solution 24B', '1rIJPEeit3ZT3sFkCkQfu2eam9nIMskZZ'], ['Solution 24C', '1CnMgTW99F_u6bf29vPUMBXLRYrqtixBr']] },
+      { set: 25, hw: '16_jraGHq52FBBPLBlXvBrBxnCQgOKprR', ts: [['Test Series 25A', '1blDYcbe8N4Yg0mcpne28LTXZIY8G7NxR'], ['Test Series 25B', '1Le29R4q1s9Bq_F1GeYc5CxPr5QReY1gn'], ['Test Series 25C', '1ztyO4Iv1-fK5Q6Ds7Ww9WKwWfTsOpYpM']], sol: [['Solution 25A', '1HtHtlHjNyTT_acvMDZ2ogSHScPttbq0R'], ['Solution 25B', '1xMZn808ptwazOQvK30uO1PEH1t8vN9qf'], ['Solution 25C', '1wbGSKmKxtjorIs_kGYnD8froetg4SA54']] },
+      { set: 26, hw: '1oCz-cumEJwGPmi-gdU__gXvnrSp4y_4V', ts: [['Test Series 26A', '13oIsafa8w8QphfcksBUAeaSjkwaQIeXo'], ['Test Series 26B', '1ZC5nCFcUSLJwG3s3nre3VDwfxygyqky0'], ['Test Series 26C', '15Fs4vfgIMU0lc7lNNfJUXmascS-tTuXh']], sol: [['Solution 26A', '1A8Eg4nnycnps-5mRZ41QXL7SxHL0aOs3'], ['Solution 26B', '1XBmzSR9tu2s_ACcbuOnvxJZtkqTbB1AO'], ['Solution 26C', '1LdSxUzjtOcFF7blkraXAd_mf_li4kP2e']] },
+      { set: 27, hw: '1roI2tq9eGjc_Fm__D2Xhz7B9Rfx3LfNL', ts: [['Test Series 27A', '1qGdz76_mcRvWwZ-vEs9tT-Ggkj6AZLo0'], ['Test Series 27B', '10qSFnPEMA_d24zw9QmMu6TGPzTgojww2'], ['Test Series 27C', '1Qm_BsZxY9y6-1cJyCtMRJuEDe_M9ykWU']], sol: [['Solution 27A', '1nszrWCGp_X-9QqcBwUi3Irtdqp50sr8S'], ['Solution 27B', '1h8hn0n9nPduwBfjUOPePs_EAREo-PaMo'], ['Solution 27C', '1jzDjhN7p2J0zfqPceuUHIdIL4YHpPH_z']] },
+      { set: 28, hw: '1L0zk6OWGUtQ9IWrr_tuw0HK7v6NK_pD0', ts: [['Test Series 28A', '17uLlPKuKbAzhahzJj5lJOdbSjEYzTylf'], ['Test Series 28B', '1PHYBl_RmHYpjpoo41xfeHeNrgGmG86iL'], ['Test Series 28C', '1RMnXlokgzx4rXtR0UXcUvNbQFdAnz9oM']], sol: [['Solution 28A', '10V7hNyYIoHSBJIacB7W5H22n9e1M_fal'], ['Solution 28B', '1-pIEiWb1fT_g7YzQADWTsBQ_o_dPE_l3'], ['Solution 28C', '1yB8-N9SeYhQDTQncZU8T3z2ruZ19Quk0']] },
+      { set: 29, hw: '1Elyl2Jd45ftJ_gpfkmzVsUaKJ6MK2DTO', ts: [['Test Series 29A', '1eXCUNhnOK6uFTPWK7WXwTqnvETpSdEmU'], ['Test Series 29B', '1OPcKg2PlVksKFEVmwe5OLEROLvwd6ukW'], ['Test Series 29C', '1KYyvlEpIt0bWDG12Mb33L338LDVZnDkg']], sol: [['Solution 29A', '1mQhx8kl8WjQ7VvYhf5N0licG7BIGWX2n'], ['Solution 29B', '1AixbhlEJAP4OtdG7d7Adiv7XwueVT4TC'], ['Solution 29C', '19Bt1kVoqkAhfW6a_Cl_PICUqxKTjVSb5']] },
+      { set: 30, hw: '1-NJkaH5wVprMoPaydVjinGgdMDWuqodj', ts: [['Test Series 30A', '1BPjs_RmUq0o9eoosLNSMdpjUr_XnrVHw'], ['Test Series 30B', '1tWIyYAn5j5Y7unSN3spXwgy5lIQuR3Wp'], ['Test Series 30C', '1IqEle97nJ7BWEw5jfbMerPu3vPipn67o']], sol: [['Solution 30A', '1FW5mmhHE4OWetmYVu502FQVqNK4hiS0C'], ['Solution 30B', '1yVjBwwgvIL2R-RQVWqMI68rjVR59kUWP'], ['Solution 30C', '1xv4ePwiMO8axILnQOftBd7x_hfPWeauJ']] },
+      { set: 31, hw: '12II0kBWddaVH21uuJfzdnXNQhGKJ0uYD', ts: [['Test Series 31A', '1MFwtgzatBMMqaYkzl4BO6c7EzNILDyWH'], ['Test Series 31B', '1mqGUt2VDXSh-Ui6oOS_xSLL67ShYcBTq'], ['Test Series 31C', '1F1-sRCWnIhZlf80ZYUmD6t01Ul-NHzDw']], sol: [['Solution 31A', '1cevu_opdRQUKKD8S2JO9Ek6mphp76cZW'], ['Solution 31B', '1PJrlZstpbFDEYxWLBzmvVduDrssnCmv_'], ['Solution 31C', '1iIAX4rbsAkcQw6hMnkOlLjs_CY90O9tb']] },
+      { set: 32, hw: '1Gyp58VdNOd-JRY1_wVNBGMlbWs793qXq', ts: [['Test Series 32A', '1kspbqN6wwXYT8ijKD3Ofz_YoDXe5NH03'], ['Test Series 32B', '1Ga3yo4jrashDayf7dNO9YYVIIhwNYaml'], ['Test Series 32C', '16RYE8uHX9VeFUiRJTNQHycbI07dJIHxM']], sol: [['Solution 32A', '1tbArVUaRsDZ2VI8tdHB3PDgXXDLSsEla'], ['Solution 32B', '1M6dXOZ7RqmlzWKHZU9aVXB2A-G2HzQxY'], ['Solution 32C', '1IQcnoV37p2gZWz9G-Px1SETacB0vaBrR']] },
+      { set: 33, hw: '1cy1Gc_CiFIVElJPdjYefRc4T9k27ekvj', ts: [['Test Series 33A', '1CNQsLpzF4untuv2ZJnR9oZ9EOk8CT6iI'], ['Test Series 33B', '1xHJKWbBj0FP0U82m4acQXFOw8JfG60_K'], ['Test Series 33C', '1l4EXOC-LJro9TUE6HFW_2bsZzD_jjizJ']], sol: [['Solution 33A', '1d9k4rOh1INm7s07K9lezbylYeC45ABUN'], ['Solution 33B', '1x3zghgnnvcpsJIrZYkgKLdFruXnV08EN'], ['Solution 33C', '1LDo6slu2ijFUNO_N5eBUT670NcJdshjr']] },
+      { set: 34, hw: '1BgGqN9KNhiahYSUxs_dHlOIc9v1iJk-h', ts: [['Test Series 34A', '1oB9LtOYkS9acbIB6jtOGfoJPwDnT85Gy'], ['Test Series 34B', '1U7FvoFf_0xNhyx6tfIWwMwsm83D9fc_D'], ['Test Series 34C', '1W2lkNU1sVDZKbZDKuNHKodUdTz7F3jla']], sol: [['Solution 34A', '1bBsd381zNqw3peoOVS5ASlmmwBEfMZJT'], ['Solution 34B', '1-halL1YcU4wK36ATr5hg02F6S_wKCJXA'], ['Solution 34C', '1Bc6XKxyX0Vqo5w8TN5IcQHC3NtX32V3p']] },
+      { set: 35, hw: '18HV0VG0Qpcnu5x1er13NH-Srap_hx6AC', ts: [['Test Series 35A', '10Fl_mm8wAKZrSfoKphr9NEgr39SbFD7d'], ['Test Series 35B', '1463BQk7NORENE_HAyRxVzrZqjLsWdgIH'], ['Test Series 35C', '1fhmqP4lhWcbSwdeoJ1U334E5nTEFl97V']], sol: [['Solution 35A', '1fquLcmtzPQPNUHIlgiGd5WbWjW6TnyjW'], ['Solution 35B', '15JI7udMx8jRPOmFDjyLIAbt27HLLr5jd'], ['Solution 35C', '1kxlKIiyenow31eK98tsjMvGkNuvPle4v']] },
+      { set: 36, hw: '1jGVbJwViAXcuZ50ZzrTFCR_i6wEVIdyR', ts: [['Test Series 36A', '1yXgaK4uEHvlkR9ve3kU0_64TDN-C23GS'], ['Test Series 36B', '1ckEYfPMKseWnzo8mqpjrP-E1i2MJMPkm'], ['Test Series 36C', '1PqNZw4CFqA2St_TgDTtFi_SoyFIpqn0U']], sol: [['Solution 36A', '1zOzpZaZXZAFJqJYmtzE2gsI7vU6tqccN'], ['Solution 36B', '1YpCxvRFTMPe7T1aBtVLLRA9RcOwYtrS4'], ['Solution 36C', '1_7EdogvVL1J9uVxT8uBjWQhGodMMjt4N']] },
+      { set: 37, hw: '1sC-ntd7FOTK7wJOln9lYmtvWVVXAeEtz', ts: [['Test Series 37A', '1O60cJpJXl181JEVEP6D77OIdBqUgS4Ef'], ['Test Series 37B', '1xG5t2z-za-Vao3UzZ76G2RHDxpYPVGrk'], ['Test Series 37C', '1YQbFkI1NfGXWQ3qD4jHZNq1Gy1B4cqwF']], sol: [['Solution 37A', '1PmVD7akB1I143DUGuooyOZC76s1GhYmC'], ['Solution 37B', '1wgCHz947A2qMEwpBCFJ5jK5FhHrT3gB3'], ['Solution 37C', '1s7WWqA-OuzJRi-ChUKX3HGAbBDKOrP7x']] },
+      { set: 38, hw: '1_BmRJ_6J6k6HgwvY4PXtJQJkjRnShWLY', ts: [['Test Series 38A', '1wazIzEG8303ENxj8cn3l-Hvj-kabXOE5'], ['Test Series 38B', '1iQhc1oBRL8TymH2qejJ0mGDuQcZ1fkGY'], ['Test Series 38C', '1TDrHcddVgf1-3F6wUyvIhNfpkgHCHECC']], sol: [['Solution 38A', '1FK-Dk7ZJ5vdG-Ldzp-x0aiUfV_0k_AA0'], ['Solution 38B', '1fvhZxbWwAPEguFcMpdLmZ9fz7D_qZeog'], ['Solution 38C', '1LZ7-bbK0xhXhDttuPUd-tIYLXcwRq1aj']] },
+      { set: 39, hw: '1C0YoZRXqfv3VKW4MWyR_yJNaXMtPhtLA', ts: [['Test Series 39A', '1v98NLXHCPVh2Q_lrmcVCnNi9gmiYN3pf'], ['Test Series 39B', '1EhWTi3chK5vw1khm6EPh-f6xnKYHH9qv'], ['Test Series 39C', '1mdW8qsTq_u5e0zBSvS-jY6KvXGk455dv']], sol: [['Solution 39A', '15_v-jJWR9BPhjugl91DywMeiJOgkV0CD'], ['Solution 39B', '19fxHo4lveDBCCBL0XMTT1kaSCLkFid6V'], ['Solution 39C', '106LldXHh-CP6h1nCZQKHpd5XbZ-_10SV']] },
+      { set: 40, hw: '1ugFiHUlDi12BFf4sHJyahuo4cJDPIe_9', ts: [['Test Series 40A', '1jKxfaYWTU768kKYkVtO0233L5t0LElTF'], ['Test Series 40B', '182bosVu-n4dLEZIC5HQ7nPI0rWpDFNjf'], ['Test Series 40C', '1WquTspQHFyAA-H0wGxFlDArItKIYiUbW']], sol: [['Solution 40A', '16wtp2hqtyAR7VoXgAMwSS8kvOzTGXtvJ'], ['Solution 40B', '1BLfudmnsCTimC6l0Z_xZc7oyScWwz7A_'], ['Solution 40C', '1z7Q-fyaji1A_W1-fpV80lJOTU5hrLB7B']] },
+      { set: 41, hw: '1o9c3Sr8pJedRS1mJJo5xxZeLUQFMLV9r', ts: [['Test Series 41A', '18RR44t62VcGIyZbM3MekTVvzRREOnFJX'], ['Test Series 41B', '1FLpne0wYx5-hp2HUlTpq8UhjaExY1G6r'], ['Test Series 41C', '1RMgacODiDzRXY3Hc3_Wtp5Q0M8MgzZMz']], sol: [['Solution 41A', '1ZF5srWu8CazXS1osXhShFXRMiZRNlSQ6'], ['Solution 41B', '1YYFVXPwZSLURS6p0mqpLhCOZ7xR8HXW1'], ['Solution 41C', '18xUuyUWdC3ROzYXfHpR6b4CyVrjSyd_J']] },
+      { set: 42, hw: '101598-wEcox7oSiydqhZm9lrn_947VIu', ts: [['Test Series 42A', '1Mylz7c24235XX6IJlkTdmE30KjmLQTnY'], ['Test Series 42B', '1f5UDl3ajGAHEnH_XT0A13PYTfvnGmNw1'], ['Test Series 42C', '1bbHCxh8NLmrlrORJr59No1QqvjWOXkU7']], sol: [['Solution 42A', '1XYd1k_dJ6ki_AMLbLJH_bbhH0aJZvfCb'], ['Solution 42B', '1wMZY6N2vYeXdiYVAMbq4A_xuMO3pKE7r'], ['Solution 42C', '19kOtT0YCA9af_Jf282yJcz9IAOBLXJfq']] },
+      { set: 43, hw: '1Gp5UF1MfI80sk1EvCMecmIIf32eFugGD', ts: [['Test Series 43A', '1VcMrLZaNVTmax0cdB5YYw16tkDrQ3TmA'], ['Test Series 43B', '1NoySC1bSTWHqhWD-TGO1ziHbSB9xpTSQ'], ['Test Series 43C', '1ULreL9ct_E2TXjAup1qycQegzj7Eub5H']], sol: [['Solution 43A', '1_LdZkMgLZSNzTw1ekOdlCgfjVvGXWuHG'], ['Solution 43B', '1RDtigACQeHsPEkbPQ-olgRpcRcmgYfWc'], ['Solution 43C', '1_lA5B9fgvUksfAwJZq5K62BiXi4_pTcF']] },
+      { set: 44, hw: '1ccB6FdLEcF4RXykuHsSqUEIfg-yi6PlC', ts: [['Test Series 44A', '1DlazRSahw9t7eYlLxPNUEH4tcnU4LK6O'], ['Test Series 44B', '1rAVT6iKzmG_gfOSG_ulZJhDA3z9wybmf'], ['Test Series 44C', '1IhhdBtI-_PFIdHFZHpd7HkaUet0-Hbo-']], sol: [['Solution 44A', '1LiCRbABjwMrWLL5tH05bmkwKWXw19FvY'], ['Solution 44B', '1Pqb04TR6kiuzWAxFuozsNuSW8AOdSStD'], ['Solution 44C', '19Fm0rTIdMZ5K5li02avliAaxBtXKwS6J']] },
+      { set: 45, hw: '1LhUSfz9G8EDYLJJ7DKN0mmZtTBvA81EQ', ts: [['Test Series 45A', '1GnQ9BoSBMdVdXTMP2s3EL8c-8_7y3rh7'], ['Test Series 45B', '1sHypuRuhCwuxnb0kZUl7INfW02QnXdHI'], ['Test Series 45C', '1fX1swj1b4-y6NfIaaOYkEtQDePXeC1-v']], sol: [['Solution 45A', '1SYjSjrz79siB14IOQbobAFw2Nqi5MwOh'], ['Solution 45B', '1QunrzRLCAv-3nSGS_9tEe-9Q1b5_SLDw'], ['Solution 45C', '1K9dPIb8mAuLVK1KA7iPOb0vJsc-JH71D']] }
+    ];
+
+    const container = document.getElementById('accordionContainer');
+    const iframe = document.getElementById('pdfFrame');
+    const placeholder = document.getElementById('placeholder');
+    const viewingTitle = document.getElementById('viewingTitle');
+
+    // Build Set List
+    setsData.forEach(item => {
+      const padNum = String(item.set).padStart(3, '0');
+      
+      const card = document.createElement('div');
+      card.className = 'set-card';
+      card.id = `card-set-${item.set}`;
+
+      // Card Header
+      const header = document.createElement('div');
+      header.className = 'set-header';
+      header.onclick = () => toggleCard(item.set);
+
+      header.innerHTML = `
+        <span class="set-index">${padNum}</span>
+        <span class="set-name">SET ${item.set} MODULE</span>
+        <span class="set-icon">▼</span>
+      `;
+
+      // Dropdown Box
+      const dropdown = document.createElement('div');
+      dropdown.className = 'set-dropdown';
+
+      dropdown.appendChild(createLink(`Homework ${item.set}`, item.hw, 'hw'));
+
+      item.ts.forEach(([title, id]) => {
+        dropdown.appendChild(createLink(title, id, 'ts'));
+      });
+
+      item.sol.forEach(([title, id]) => {
+        dropdown.appendChild(createLink(title, id, 'sol'));
+      });
+
+      card.appendChild(header);
+      card.appendChild(dropdown);
+      container.appendChild(card);
+    });
+
+    function createLink(title, id, type) {
+      const link = document.createElement('div');
+      link.className = 'doc-link';
+
+      let badgeClass = 'badge-hw';
+      let badgeText = 'HW';
+      if(type === 'ts') { badgeClass = 'badge-ts'; badgeText = 'TEST'; }
+      if(type === 'sol') { badgeClass = 'badge-sol'; badgeText = 'SOL'; }
+
+      link.innerHTML = `
+        <span class="badge ${badgeClass}">${badgeText}</span>
+        <span>${title}</span>
+      `;
+
+      link.onclick = (e) => {
+        e.stopPropagation();
+        document.querySelectorAll('.doc-link').forEach(l => l.classList.remove('active-item'));
+        link.classList.add('active-item');
+        loadPdf(title, id);
+      };
+
+      return link;
+    }
+
+    function toggleCard(setNum) {
+      const allCards = document.querySelectorAll('.set-card');
+      const targetCard = document.getElementById(`card-set-${setNum}`);
+      const isAlreadyActive = targetCard.classList.contains('active');
+
+      allCards.forEach(c => c.classList.remove('active'));
+
+      if (!isAlreadyActive) {
+        targetCard.classList.add('active');
+      }
+    }
+
+    function loadPdf(title, fileId) {
+      viewingTitle.innerText = `📄 ${title}`;
+      placeholder.style.display = 'none';
+      iframe.style.display = 'block';
+      iframe.src = `https://drive.google.com/file/d/${fileId}/preview`;
+      resetZoom();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* -------------------------------------------------------------
+       PINCH TO ZOOM & PAN LOGIC
+       ------------------------------------------------------------- */
+    const zoomViewport = document.getElementById('zoomViewport');
+    const zoomLayer = document.getElementById('zoomLayer');
+    const touchOverlay = document.getElementById('touchOverlay');
+    const zoomDisplay = document.getElementById('zoomDisplay');
+
+    let scale = 1;
+    let minScale = 1;
+    let maxScale = 4;
+    let pointX = 0;
+    let pointY = 0;
+    let startPointX = 0;
+    let startPointY = 0;
+    let isPanning = false;
+    let initialDistance = 0;
+    let initialScale = 1;
+    let lastTap = 0;
+
+    function updateTransform() {
+      const rect = zoomViewport.getBoundingClientRect();
+      const maxTranslateX = 0;
+      const minTranslateX = rect.width * (1 - scale);
+      const maxTranslateY = 0;
+      const minTranslateY = rect.height * (1 - scale);
+
+      if (scale === 1) {
+        pointX = 0;
+        pointY = 0;
+      } else {
+        pointX = Math.min(maxTranslateX, Math.max(minTranslateX, pointX));
+        pointY = Math.min(maxTranslateY, Math.max(minTranslateY, pointY));
+      }
+
+      zoomLayer.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
+      zoomDisplay.innerText = `${Math.round(scale * 100)}%`;
+
+      if (scale > 1.05) {
+        touchOverlay.style.display = 'block';
+      } else {
+        touchOverlay.style.display = 'none';
+      }
+    }
+
+    function setZoom(newScale, centerX, centerY) {
+      newScale = Math.min(Math.max(newScale, minScale), maxScale);
+      if (newScale === scale) return;
+
+      const rect = zoomViewport.getBoundingClientRect();
+      const cx = centerX !== undefined ? centerX - rect.left : rect.width / 2;
+      const cy = centerY !== undefined ? centerY - rect.top : rect.height / 2;
+
+      pointX = cx - (cx - pointX) * (newScale / scale);
+      pointY = cy - (cy - pointY) * (newScale / scale);
+      scale = newScale;
+
+      updateTransform();
+    }
+
+    function resetZoom() {
+      scale = 1;
+      pointX = 0;
+      pointY = 0;
+      updateTransform();
+    }
+
+    zoomViewport.addEventListener('touchstart', function(e) {
+      if (e.touches.length === 2) {
+        touchOverlay.style.display = 'block';
+        initialDistance = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        initialScale = scale;
+      } else if (e.touches.length === 1) {
+        const currentTime = new Date().getTime();
+        const tapInterval = currentTime - lastTap;
+        if (tapInterval < 300 && tapInterval > 0) {
+          if (scale > 1.2) {
+            resetZoom();
+          } else {
+            setZoom(2.2, e.touches[0].clientX, e.touches[0].clientY);
+          }
+          lastTap = 0;
+          e.preventDefault();
+          return;
+        }
+        lastTap = currentTime;
+
+        if (scale > 1) {
+          isPanning = true;
+          startPointX = e.touches[0].clientX - pointX;
+          startPointY = e.touches[0].clientY - pointY;
+        }
+      }
+    }, { passive: false });
+
+    zoomViewport.addEventListener('touchmove', function(e) {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        const currentDistance = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+
+        if (initialDistance > 0) {
+          const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+          const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+          const targetScale = initialScale * (currentDistance / initialDistance);
+          setZoom(targetScale, midX, midY);
+        }
+      } else if (e.touches.length === 1 && isPanning) {
+        e.preventDefault();
+        pointX = e.touches[0].clientX - startPointX;
+        pointY = e.touches[0].clientY - startPointY;
+        updateTransform();
+      }
+    }, { passive: false });
+
+    zoomViewport.addEventListener('touchend', function(e) {
+      if (e.touches.length < 2) {
+        initialDistance = 0;
+      }
+      if (e.touches.length === 0) {
+        isPanning = false;
+        if (scale <= 1.05) {
+          resetZoom();
+        }
+      }
+    });
+
+    document.getElementById('btnZoomIn').addEventListener('click', () => setZoom(scale + 0.3));
+    document.getElementById('btnZoomOut').addEventListener('click', () => setZoom(scale - 0.3));
+    document.getElementById('btnZoomReset').addEventListener('click', () => resetZoom());
+
+    // Protection shortcut blockers
+    document.addEventListener('keydown', function (e) {
+      if (
+        (e.ctrlKey && (e.key === 's' || e.key === 'p' || e.key === 'u' || e.key === 'c')) ||
+        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
+        e.key === 'F12'
+      ) {
+        e.preventDefault();
+        return false;
+      }
+    });
+  </script>
+</body>
+</html>
