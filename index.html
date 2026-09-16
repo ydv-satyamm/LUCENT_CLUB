@@ -199,7 +199,7 @@
     }
 
     /* =========================================================
-       TOP STICKY PDF VIEWER (65vh, FULL WIDTH)
+       TOP STICKY PDF VIEWER
        ========================================================= */
     .viewer-wrapper {
       position: sticky;
@@ -283,14 +283,16 @@
       text-align: center;
     }
 
+    /* Free Pan/Scroll container fix: overflow auto with momentum touch */
     .iframe-container {
       flex: 1;
       width: 100%;
       height: 100%;
       position: relative;
       background-color: #0d1117;
-      overflow: hidden;
-      touch-action: none;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-x pan-y pinch-zoom;
     }
 
     .viewer-wrapper.dark-pdf-active,
@@ -302,17 +304,16 @@
     .zoomable-layer {
       width: 100%;
       height: 100%;
-      position: absolute;
-      top: 0;
-      left: 0;
-      transform-origin: 0 0;
-      will-change: transform;
+      min-width: 100%;
+      min-height: 100%;
+      position: relative;
       background-color: #0d1117;
+      display: flex;
+      transition: width 0.15s ease, height 0.15s ease;
     }
 
     iframe {
       width: 100%;
-      max-width: 100%;
       height: 100%;
       border: none;
       pointer-events: auto;
@@ -327,13 +328,6 @@
       background: #000000;
     }
 
-    .touch-overlay {
-      position: absolute;
-      inset: 0;
-      z-index: 5;
-      display: none;
-    }
-
     .placeholder-text {
       position: absolute;
       inset: 0;
@@ -345,16 +339,18 @@
       text-align: center;
       padding: 20px;
       z-index: 2;
+      pointer-events: none;
     }
 
     .protection-shield {
-      position: absolute;
+      position: fixed;
       top: 0;
       right: 0;
       width: 60px;
       height: 60px;
       z-index: 10;
       background: transparent;
+      pointer-events: none;
     }
 
     /* =========================================================
@@ -362,10 +358,10 @@
        ========================================================= */
     .fs-nav-btn {
       display: none;
-      position: absolute;
-      bottom: 18px;
-      z-index: 70;
-      background: rgba(22, 27, 34, 0.9);
+      position: fixed;
+      bottom: 20px;
+      z-index: 9999;
+      background: rgba(22, 27, 34, 0.92);
       color: #f0f6fc;
       border: 1px solid #388bfd66;
       backdrop-filter: blur(10px);
@@ -389,10 +385,6 @@
       transform: translateY(-2px);
     }
 
-    .fs-nav-btn:active:not(:disabled) {
-      transform: translateY(0);
-    }
-
     .fs-nav-btn:disabled {
       opacity: 0.3;
       cursor: not-allowed;
@@ -408,19 +400,19 @@
       right: 18px;
     }
 
-    /* Floating Zoom Controls Above Prev Button in Fullscreen */
+    /* Floating Zoom Controls Directly Above Prev Button in Fullscreen */
     .fs-zoom-stack {
       display: none;
-      position: absolute;
-      bottom: 66px;
+      position: fixed;
+      bottom: 68px;
       left: 18px;
-      z-index: 70;
+      z-index: 9999;
       flex-direction: column;
       gap: 6px;
     }
 
     .fs-zoom-btn {
-      background: rgba(22, 27, 34, 0.9);
+      background: rgba(22, 27, 34, 0.92);
       color: #f0f6fc;
       border: 1px solid #388bfd66;
       backdrop-filter: blur(10px);
@@ -443,10 +435,6 @@
       border-color: #58a6ff;
       color: #58a6ff;
       transform: scale(1.06);
-    }
-
-    .fs-zoom-btn:active {
-      transform: scale(0.96);
     }
 
     /* Reveal Controls ONLY when Fullscreen is Active */
@@ -613,123 +601,32 @@
       </div>
       <div class="modal-body">
         <h3 style="color: #58a6ff; border: none; font-size: 17px; margin-top:0;">🎯 Lucent Practice Set — Introduction</h3>
-        
-        <h3 style="color: #e6edf3;">📝 1. Lucent Practice Set की मुख्य विशेषताएँ</h3>
         <p>📌 नवीनतम पाठ्यक्रम एवं परीक्षा पैटर्न पर आधारित महत्वपूर्ण प्रश्न।</p>
         <p>📖 Lucent’s सामान्य ज्ञान (Subjective) के टॉपिक-वाइज निचोड़ से तैयार किए गए MCQ।</p>
         <p>🎯 Lucent’s सामान्य ज्ञान के प्रत्येक टॉपिक से प्रश्नों को एक विशेष प्रश्न-शृंखला के रूप में तैयार किया गया है।</p>
         <p>📅 <strong>Daily Lucent Practice:</strong> हर दिन Lucent’s सामान्य ज्ञान के 4–6 टॉपिक से मिलाकर 1 Practice Set अपलोड किया गया है।</p>
-
         <hr class="modal-divider">
-
         <h3 style="color: #e6edf3;">⏰ 📅 Set Upload Time-Table</h3>
         <table class="modal-table">
-          <thead>
-            <tr>
-              <th>📚 Activity</th>
-              <th>⏰ Time</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>📝 Homework</td>
-              <td>Daily Scheduled</td>
-            </tr>
-            <tr>
-              <td>🎯 Set Practice</td>
-              <td>Daily Scheduled</td>
-            </tr>
-          </tbody>
+          <thead><tr><th>📚 Activity</th><th>⏰ Time</th></tr></thead>
+          <tbody><tr><td>📝 Homework</td><td>Daily Scheduled</td></tr><tr><td>🎯 Set Practice</td><td>Daily Scheduled</td></tr></tbody>
         </table>
-
         <hr class="modal-divider">
-
         <h3 style="color: #e6edf3;">📖 2. How to Read Lucent Book</h3>
         <p style="color: #f59e0b; font-weight:600;">🚀 7 सबसे असरदार और Advanced Level Smart Study Tricks</p>
-
-        <p><strong>1️⃣ 🔦 Highlight → ज़रूरी चीज़ों पर फोकस करें</strong><br>
-        <em>क्या करें?</em><br>
-        🔹 पूरी लाइन को Highlight न करें।<br>
-        🔹 सिर्फ Dates, Names, Definitions, Numbers और Important Facts को Highlight करें।<br>
-        🔹 दोबारा पढ़ते समय केवल Highlight की हुई जरूरी चीज़ें दिखाई देंगी।<br>
-        ⚠️ <em>एक बार में जरूरत जितना ही Highlight करें, वरना पूरी किताब पीली दिखाई देगी! 😄</em></p>
-
-        <hr class="modal-divider">
-
-        <p><strong>2️⃣ 📖 Read → पहली बार समझकर पढ़ें</strong><br>
-        <em>क्या करें?</em><br>
-        🔹 धीरे-धीरे पढ़ें और हर Paragraph के बाद खुद से पूछें:<br>
-        💭 <em>"मैंने अभी क्या पढ़ा?"</em><br>
-        🧠 इससे दिमाग Active रहेगा और याददाश्त मजबूत होगी।</p>
-
-        <hr class="modal-divider">
-
-        <p><strong>3️⃣ 🔄 Interleaving → अलग-अलग विषयों को मिलाकर पढ़ें</strong><br>
-        <em>क्या करें?</em><br>
-        ❌ एक ही विषय को लगातार घंटों तक न पढ़ें।<br>
-        ✅ उदाहरण:<br>
-        🕐 30 मिनट — इतिहास<br>
-        🕐 30 मिनट — विज्ञान<br>
-        🕐 30 मिनट — विविध<br>
-        🔄 इससे दिमाग लगातार Switch करता रहता है और पढ़ाई में ऊब कम होती है, जिससे चीज़ें बेहतर याद रहती हैं।</p>
-
-        <hr class="modal-divider">
-
-        <p><strong>4️⃣ 👁️ Visual Learning → दिमाग "दृश्य" से तेज़ सीखता है</strong><br>
-        <em>क्या करें?</em><br>
-        🧠 Mind Maps बनाएं।<br>
-        📊 Flowcharts बनाएं।<br>
-        🖼️ Diagrams का उपयोग करें।<br>
-        🌍 भूगोल, 📜 इतिहास और 🔬 विज्ञान के Topics को Picture/Visual के रूप में सोचने की कोशिश करें।<br>
-        💡 हमारा मस्तिष्क केवल Text की तुलना में Images को अधिक प्रभावी ढंग से याद रख सकता है।</p>
-
-        <hr class="modal-divider">
-
-        <p><strong>5️⃣ ❤️ Emotion से जोड़ें → भावनाओं के साथ याद करें</strong><br>
-        🧠 दिमाग चीज़ों को भावनाओं और कहानियों से जोड़कर बेहतर याद रखता है।<br>
-        <em>क्या करें?</em><br>
-        🔹 हर Fact के साथ कोई मज़ेदार, डरावनी या Emotional कहानी/Association जोड़ें।<br>
-        📌 उदाहरण: 1857 का विद्रोह ➡️ मंगल पांडे की बहादुरी ➡️ क्रांति की चिंगारी 🔥<br>
-        🎯 इस तरह कोई घटना आपकी Memory में एक Strong Anchor बन जाती है।</p>
-
-        <hr class="modal-divider">
-
-        <p><strong>6️⃣ 🧪 Retrieval Practice → खुद से लगातार Test लें</strong><br>
-        <span style="color: #f59e0b; font-weight:700;">⭐ MOST IMPORTANT</span><br>
-        <em>क्या करें?</em><br>
-        📝 हर Topic पढ़ने के बाद उसी Topic का MCQ Set लगाएं।<br>
-        🎯 Practice ही Selection की पहली सीढ़ी है।<br>
-        📅 रोज़ एक Set = 🚶 सफलता की ओर एक कदम।<br>
-        📖 पढ़ना एक बार है, मगर Practice हर दिन है।<br>
-        💪 क्योंकि Selection सिर्फ पढ़ने से नहीं, लगातार Practice करने से होता है।<br>
-        🧠 जितना ज्यादा Practice करेंगे, उतनी ही Strong Memory बनेगी।</p>
-
-        <hr class="modal-divider">
-
-        <p><strong>7️⃣ 🔁 Revise → बार-बार दोहराना जरूरी है</strong><br>
-        📅 Revision Plan:<br>
-        🟢 Day 1 → पहली बार पढ़ें<br>
-        🔵 Day 2 → पहला Revision<br>
-        🟠 Day 7 → दूसरा Revision<br>
-        🔴 Day 15 → Final Revision<br>
-        💡 हर बार Revision में कम समय लगेगा और आपकी Memory और मजबूत होती जाएगी।</p>
-
-        <hr class="modal-divider">
-
+        <p><strong>1️⃣ 🔦 Highlight → ज़रूरी चीज़ों पर फोकस करें</strong><br>सिर्फ Dates, Names, Definitions और Important Facts Highlight करें।</p>
+        <p><strong>2️⃣ 📖 Read → पहली बार समझकर पढ़ें</strong><br>हर Paragraph के बाद खुद से पूछें: <em>"मैंने अभी क्या पढ़ा?"</em></p>
+        <p><strong>3️⃣ 🔄 Interleaving → अलग-अलग विषयों को मिलाकर पढ़ें</strong><br>30 मिनट इतिहास, 30 मिनट विज्ञान — दिमाग Active रहेगा।</p>
+        <p><strong>4️⃣ 👁️ Visual Learning → Mind Maps & Flowcharts बनाएं</strong></p>
+        <p><strong>5️⃣ ❤️ Emotion से जोड़ें → कहानियों के साथ याद करें</strong></p>
+        <p><strong>6️⃣ 🧪 Retrieval Practice → रोज़ Practice Set लगाएं</strong></p>
+        <p><strong>7️⃣ 🔁 Revise → बार-बार दोहराना जरूरी है</strong></p>
         <div class="highlight-box">
           <h4 style="color: #fbbf24; margin-bottom: 6px;">🏆 याद रखें!</h4>
-          <p style="margin-bottom: 4px;"><strong>📚 Study + Practice + Revision = Selection</strong></p>
-          <p style="margin-bottom: 0;">🔥 रोज़ एक कदम आगे बढ़ें। • 🎯 रोज़ Practice करें। • 🧠 Smart तरीके से पढ़ें। • 🔁 नियमित Revision करें।</p>
+          <p style="margin-bottom: 0;"><strong>📚 Study + Practice + Revision = Selection</strong></p>
         </div>
-
         <p style="text-align: center; color: #58a6ff; font-weight: 700; margin: 12px 0;">
-          ⚡ "पढ़ाई खुद की, Planning हमारी — ⚡ Powered by 𓊈 ꕶ𝐚𐍄ꪗ𝓪𝓂 𓊉 🚩<br>
-          यही है Self-Study CONTENT की असली ताकत!" 🚩
-        </p>
-
-        <p style="text-align: center; color: #f43f5e; font-weight: 700;">
-          ❤️ LUCENT CLUB<br>
-          <span style="color: #c9d1d9; font-weight: 500;">📚 पढ़ो • 📝 Practice करो • 🔁 Revise करो • 🏆 Select हो जाओ</span>
+          ⚡ "पढ़ाई खुद की, Planning हमारी — ⚡ Powered by 𓊈 ꕶ𝐚𐍄ꪗ𝓪𝓂 𓊉 🚩
         </p>
       </div>
       <div class="modal-footer">
@@ -741,7 +638,7 @@
   <!-- Watermark -->
   <div class="watermark">⚡ Powered by 𓊈 ꕶ𝐚𐍄ꪗ𝓪𝓂 𓊉 🚩</div>
 
-  <!-- Top Sticky PDF Viewer (65vh, Max Width with Pinch Zoom) -->
+  <!-- Top Sticky PDF Viewer -->
   <div class="viewer-wrapper" id="viewerWrapper">
     <div class="viewer-header" id="viewerHeader">
       <span id="viewingTitle">PDF Preview</span>
@@ -760,7 +657,6 @@
         नीचे दिए गए किसी भी सेट पर क्लिक करें और अध्ययन सामग्री लोड करें
       </div>
       <div class="zoomable-layer" id="zoomLayer">
-        <div class="touch-overlay" id="touchOverlay"></div>
         <iframe id="pdfFrame" src="" style="display: none;"></iframe>
       </div>
 
@@ -777,7 +673,7 @@
     </div>
   </div>
 
-  <!-- Content / Sets List (Compact) -->
+  <!-- Content / Sets List -->
   <div class="content-area">
     <div class="section-title">
       <span>📚</span>
@@ -788,14 +684,11 @@
   </div>
 
   <script>
-    // Close Welcome Modal
     function closeModal() {
       const modal = document.getElementById('welcomeModal');
       modal.style.opacity = '0';
       modal.style.transition = 'opacity 0.25s ease';
-      setTimeout(() => {
-        modal.style.display = 'none';
-      }, 250);
+      setTimeout(() => { modal.style.display = 'none'; }, 250);
     }
 
     const setsData = [
@@ -859,10 +752,14 @@
     const btnFsZoomIn = document.getElementById('btnFsZoomIn');
     const btnFsZoomOut = document.getElementById('btnFsZoomOut');
     const btnFsZoomReset = document.getElementById('btnFsZoomReset');
+    const zoomViewport = document.getElementById('zoomViewport');
+    const zoomLayer = document.getElementById('zoomLayer');
+    const zoomDisplay = document.getElementById('zoomDisplay');
 
     let isPdfDarkMode = false;
     let allDocumentsList = [];
     let currentDocIndex = -1;
+    let scale = 1;
 
     // Dark / Light Mode Toggle for PDF
     btnThemeToggle.addEventListener('click', () => {
@@ -878,7 +775,7 @@
       }
     });
 
-    // Fullscreen Toggle Logic
+    // Fullscreen Toggle
     function isCurrentlyFullscreen() {
       return !!(
         document.fullscreenElement ||
@@ -889,7 +786,6 @@
 
     function toggleFullscreen() {
       const active = isCurrentlyFullscreen();
-
       if (!active) {
         if (viewerWrapper.requestFullscreen) {
           viewerWrapper.requestFullscreen().catch(() => {
@@ -913,7 +809,6 @@
       updateNavButtons();
     }
 
-    // Sync fullscreen state on change
     ['fullscreenchange', 'webkitfullscreenchange'].forEach(evt => {
       document.addEventListener(evt, () => {
         if (!document.fullscreenElement && !document.webkitFullscreenElement) {
@@ -926,20 +821,16 @@
       });
     });
 
-    // Fullscreen Button Click
     btnFullscreen.addEventListener('click', toggleFullscreen);
 
-    // Double Click / Double Tap on Viewer Header to Toggle Fullscreen
     viewerHeader.addEventListener('dblclick', (e) => {
-      if (e.target.tagName !== 'BUTTON') {
-        toggleFullscreen();
-      }
+      if (e.target.tagName !== 'BUTTON') toggleFullscreen();
     });
 
     let lastHeaderTap = 0;
     viewerHeader.addEventListener('touchend', (e) => {
       if (e.target.tagName === 'BUTTON') return;
-      const now = new Date().getTime();
+      const now = Date.now();
       if (now - lastHeaderTap < 320 && now - lastHeaderTap > 0) {
         toggleFullscreen();
         lastHeaderTap = 0;
@@ -948,42 +839,59 @@
       }
     });
 
-    // Flatten data & Build Set List
+    // Unlocked Smooth Zoom Engine (Using direct dimensions to prevent scroll lock)
+    function applyZoom(newScale) {
+      scale = Math.min(Math.max(newScale, 1), 3.5);
+      
+      const prevScrollXRatio = zoomViewport.scrollLeft / (zoomViewport.scrollWidth || 1);
+      const prevScrollYRatio = zoomViewport.scrollTop / (zoomViewport.scrollHeight || 1);
+
+      zoomLayer.style.width = `${scale * 100}%`;
+      zoomLayer.style.height = `${scale * 100}%`;
+      zoomDisplay.innerText = `${Math.round(scale * 100)}%`;
+
+      // Restore scroll center seamlessly
+      requestAnimationFrame(() => {
+        zoomViewport.scrollLeft = prevScrollXRatio * zoomViewport.scrollWidth;
+        zoomViewport.scrollTop = prevScrollYRatio * zoomViewport.scrollHeight;
+      });
+    }
+
+    function resetZoom() {
+      applyZoom(1);
+      zoomViewport.scrollLeft = 0;
+      zoomViewport.scrollTop = 0;
+    }
+
+    // Build Sets & Flatten List
     setsData.forEach(item => {
       const padNum = String(item.set).padStart(3, '0');
-      
       const card = document.createElement('div');
       card.className = 'set-card';
       card.id = `card-set-${item.set}`;
 
-      // Card Header
       const header = document.createElement('div');
       header.className = 'set-header';
       header.onclick = () => toggleCard(item.set);
-
       header.innerHTML = `
         <span class="set-index">${padNum}</span>
         <span class="set-name">SET ${item.set} MODULE</span>
         <span class="set-icon">▼</span>
       `;
 
-      // Dropdown Box
       const dropdown = document.createElement('div');
       dropdown.className = 'set-dropdown';
 
-      // HW
       const hwLink = createLink(`Homework ${item.set}`, item.hw, 'hw', item.set);
       dropdown.appendChild(hwLink.element);
       allDocumentsList.push(hwLink.data);
 
-      // Test Series
       item.ts.forEach(([title, id]) => {
         const tsLink = createLink(title, id, 'ts', item.set);
         dropdown.appendChild(tsLink.element);
         allDocumentsList.push(tsLink.data);
       });
 
-      // Solutions
       item.sol.forEach(([title, id]) => {
         const solLink = createLink(title, id, 'sol', item.set);
         dropdown.appendChild(solLink.element);
@@ -1001,27 +909,16 @@
 
       let badgeClass = 'badge-hw';
       let badgeText = 'HW';
-      if(type === 'ts') { badgeClass = 'badge-ts'; badgeText = 'TEST'; }
-      if(type === 'sol') { badgeClass = 'badge-sol'; badgeText = 'SOL'; }
+      if (type === 'ts') { badgeClass = 'badge-ts'; badgeText = 'TEST'; }
+      if (type === 'sol') { badgeClass = 'badge-sol'; badgeText = 'SOL'; }
 
-      link.innerHTML = `
-        <span class="badge ${badgeClass}">${badgeText}</span>
-        <span>${title}</span>
-      `;
-
-      const docItem = {
-        title,
-        id,
-        setNum,
-        element: link
-      };
+      link.innerHTML = `<span class="badge ${badgeClass}">${badgeText}</span><span>${title}</span>`;
+      const docItem = { title, id, setNum, element: link };
 
       link.onclick = (e) => {
         e.stopPropagation();
         const foundIndex = allDocumentsList.findIndex(d => d.id === id && d.title === title);
-        if (foundIndex !== -1) {
-          loadPdfByIndex(foundIndex);
-        }
+        if (foundIndex !== -1) loadPdfByIndex(foundIndex);
       };
 
       return { element: link, data: docItem };
@@ -1033,12 +930,8 @@
       if (!targetCard) return;
 
       const isAlreadyActive = targetCard.classList.contains('active');
-
       allCards.forEach(c => c.classList.remove('active'));
-
-      if (forceOpen || !isAlreadyActive) {
-        targetCard.classList.add('active');
-      }
+      if (forceOpen || !isAlreadyActive) targetCard.classList.add('active');
     }
 
     function updateNavButtons() {
@@ -1051,16 +944,10 @@
       currentDocIndex = index;
       const doc = allDocumentsList[index];
 
-      // Update active styling
       document.querySelectorAll('.doc-link').forEach(l => l.classList.remove('active-item'));
-      if (doc.element) {
-        doc.element.classList.add('active-item');
-      }
+      if (doc.element) doc.element.classList.add('active-item');
 
-      // Open parent card
       toggleCard(doc.setNum, true);
-
-      // Load PDF
       viewingTitle.innerText = `📄 ${doc.title}`;
       placeholder.style.display = 'none';
       iframe.style.display = 'block';
@@ -1069,177 +956,27 @@
       updateNavButtons();
     }
 
-    // Previous & Next Button Click Listeners
     btnPrevPdf.addEventListener('click', (e) => {
       e.stopPropagation();
-      if (currentDocIndex > 0) {
-        loadPdfByIndex(currentDocIndex - 1);
-      }
+      if (currentDocIndex > 0) loadPdfByIndex(currentDocIndex - 1);
     });
 
     btnNextPdf.addEventListener('click', (e) => {
       e.stopPropagation();
-      if (currentDocIndex === -1) {
-        loadPdfByIndex(0);
-      } else if (currentDocIndex < allDocumentsList.length - 1) {
-        loadPdfByIndex(currentDocIndex + 1);
-      }
+      if (currentDocIndex === -1) loadPdfByIndex(0);
+      else if (currentDocIndex < allDocumentsList.length - 1) loadPdfByIndex(currentDocIndex + 1);
     });
 
-    updateNavButtons();
+    // Zoom Buttons Listeners
+    document.getElementById('btnZoomIn').addEventListener('click', () => applyZoom(scale + 0.25));
+    document.getElementById('btnZoomOut').addEventListener('click', () => applyZoom(scale - 0.25));
+    document.getElementById('btnZoomReset').addEventListener('click', resetZoom);
 
-    /* -------------------------------------------------------------
-       PINCH TO ZOOM & PAN LOGIC
-       ------------------------------------------------------------- */
-    const zoomViewport = document.getElementById('zoomViewport');
-    const zoomLayer = document.getElementById('zoomLayer');
-    const touchOverlay = document.getElementById('touchOverlay');
-    const zoomDisplay = document.getElementById('zoomDisplay');
+    btnFsZoomIn.addEventListener('click', (e) => { e.stopPropagation(); applyZoom(scale + 0.25); });
+    btnFsZoomOut.addEventListener('click', (e) => { e.stopPropagation(); applyZoom(scale - 0.25); });
+    btnFsZoomReset.addEventListener('click', (e) => { e.stopPropagation(); resetZoom(); });
 
-    let scale = 1;
-    let minScale = 1;
-    let maxScale = 4;
-    let pointX = 0;
-    let pointY = 0;
-    let startPointX = 0;
-    let startPointY = 0;
-    let isPanning = false;
-    let initialDistance = 0;
-    let initialScale = 1;
-    let lastTap = 0;
-
-    function updateTransform() {
-      const rect = zoomViewport.getBoundingClientRect();
-      const maxTranslateX = 0;
-      const minTranslateX = rect.width * (1 - scale);
-      const maxTranslateY = 0;
-      const minTranslateY = rect.height * (1 - scale);
-
-      if (scale === 1) {
-        pointX = 0;
-        pointY = 0;
-      } else {
-        pointX = Math.min(maxTranslateX, Math.max(minTranslateX, pointX));
-        pointY = Math.min(maxTranslateY, Math.max(minTranslateY, pointY));
-      }
-
-      zoomLayer.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
-      zoomDisplay.innerText = `${Math.round(scale * 100)}%`;
-
-      if (scale > 1.05) {
-        touchOverlay.style.display = 'block';
-      } else {
-        touchOverlay.style.display = 'none';
-      }
-    }
-
-    function setZoom(newScale, centerX, centerY) {
-      newScale = Math.min(Math.max(newScale, minScale), maxScale);
-      if (newScale === scale) return;
-
-      const rect = zoomViewport.getBoundingClientRect();
-      const cx = centerX !== undefined ? centerX - rect.left : rect.width / 2;
-      const cy = centerY !== undefined ? centerY - rect.top : rect.height / 2;
-
-      pointX = cx - (cx - pointX) * (newScale / scale);
-      pointY = cy - (cy - pointY) * (newScale / scale);
-      scale = newScale;
-
-      updateTransform();
-    }
-
-    function resetZoom() {
-      scale = 1;
-      pointX = 0;
-      pointY = 0;
-      updateTransform();
-    }
-
-    zoomViewport.addEventListener('touchstart', function(e) {
-      if (e.touches.length === 2) {
-        touchOverlay.style.display = 'block';
-        initialDistance = Math.hypot(
-          e.touches[0].clientX - e.touches[1].clientX,
-          e.touches[0].clientY - e.touches[1].clientY
-        );
-        initialScale = scale;
-      } else if (e.touches.length === 1) {
-        const currentTime = new Date().getTime();
-        const tapInterval = currentTime - lastTap;
-        if (tapInterval < 300 && tapInterval > 0) {
-          if (scale > 1.2) {
-            resetZoom();
-          } else {
-            setZoom(2.2, e.touches[0].clientX, e.touches[0].clientY);
-          }
-          lastTap = 0;
-          e.preventDefault();
-          return;
-        }
-        lastTap = currentTime;
-
-        if (scale > 1) {
-          isPanning = true;
-          startPointX = e.touches[0].clientX - pointX;
-          startPointY = e.touches[0].clientY - pointY;
-        }
-      }
-    }, { passive: false });
-
-    zoomViewport.addEventListener('touchmove', function(e) {
-      if (e.touches.length === 2) {
-        e.preventDefault();
-        const currentDistance = Math.hypot(
-          e.touches[0].clientX - e.touches[1].clientX,
-          e.touches[0].clientY - e.touches[1].clientY
-        );
-
-        if (initialDistance > 0) {
-          const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-          const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-          const targetScale = initialScale * (currentDistance / initialDistance);
-          setZoom(targetScale, midX, midY);
-        }
-      } else if (e.touches.length === 1 && isPanning) {
-        e.preventDefault();
-        pointX = e.touches[0].clientX - startPointX;
-        pointY = e.touches[0].clientY - startPointY;
-        updateTransform();
-      }
-    }, { passive: false });
-
-    zoomViewport.addEventListener('touchend', function(e) {
-      if (e.touches.length < 2) {
-        initialDistance = 0;
-      }
-      if (e.touches.length === 0) {
-        isPanning = false;
-        if (scale <= 1.05) {
-          resetZoom();
-        }
-      }
-    });
-
-    // Standard Toolbar Zoom Buttons
-    document.getElementById('btnZoomIn').addEventListener('click', () => setZoom(scale + 0.3));
-    document.getElementById('btnZoomOut').addEventListener('click', () => setZoom(scale - 0.3));
-    document.getElementById('btnZoomReset').addEventListener('click', () => resetZoom());
-
-    // Fullscreen Overlay Zoom Buttons (Over Prev Button)
-    btnFsZoomIn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      setZoom(scale + 0.3);
-    });
-    btnFsZoomOut.addEventListener('click', (e) => {
-      e.stopPropagation();
-      setZoom(scale - 0.3);
-    });
-    btnFsZoomReset.addEventListener('click', (e) => {
-      e.stopPropagation();
-      resetZoom();
-    });
-
-    // Protection shortcut blockers
+    // Keyboard Shortcuts Blocker
     document.addEventListener('keydown', function (e) {
       if (
         (e.ctrlKey && (e.key === 's' || e.key === 'p' || e.key === 'u' || e.key === 'c')) ||
