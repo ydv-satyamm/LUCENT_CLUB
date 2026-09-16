@@ -206,12 +206,32 @@
       top: 0;
       width: 100%;
       height: 65vh;
-      background-color: #161b22;
+      background-color: #0d1117;
       border-bottom: 2px solid #30363d;
       z-index: 100;
       display: flex;
       flex-direction: column;
       box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+      transition: height 0.2s ease;
+    }
+
+    /* Native & Fallback Fullscreen Styles */
+    .viewer-wrapper:fullscreen,
+    .viewer-wrapper:-webkit-full-screen {
+      height: 100vh !important;
+      width: 100vw !important;
+      max-width: 100% !important;
+      border-bottom: none;
+    }
+
+    .viewer-wrapper.fullscreen-mode {
+      position: fixed !important;
+      inset: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      max-width: 100% !important;
+      z-index: 99999 !important;
+      border-bottom: none;
     }
 
     .viewer-header {
@@ -224,6 +244,7 @@
       align-items: center;
       border-bottom: 1px solid #21262d;
       flex-shrink: 0;
+      cursor: default;
     }
 
     .zoom-toolbar {
@@ -241,11 +262,17 @@
       padding: 2px 8px;
       border-radius: 4px;
       cursor: pointer;
-      transition: background 0.15s;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
     }
 
     .zoom-btn:hover {
       background: #30363d;
+      color: #58a6ff;
+    }
+
+    .zoom-btn.active-btn {
+      background: #1f2937;
+      border-color: #58a6ff;
       color: #58a6ff;
     }
 
@@ -261,9 +288,15 @@
       width: 100%;
       height: 100%;
       position: relative;
-      background: #0d1117;
+      background-color: #0d1117;
       overflow: hidden;
       touch-action: none;
+    }
+
+    .viewer-wrapper.dark-pdf-active,
+    .viewer-wrapper.dark-pdf-active .iframe-container,
+    .viewer-wrapper.dark-pdf-active .zoomable-layer {
+      background-color: #000000 !important;
     }
 
     .zoomable-layer {
@@ -274,6 +307,7 @@
       left: 0;
       transform-origin: 0 0;
       will-change: transform;
+      background-color: #0d1117;
     }
 
     iframe {
@@ -282,6 +316,15 @@
       height: 100%;
       border: none;
       pointer-events: auto;
+      background-color: transparent;
+      transition: filter 0.25s ease;
+    }
+
+    /* PDF Dark Mode Filter */
+    iframe.pdf-dark-mode {
+      filter: invert(0.92) hue-rotate(180deg) contrast(1.15) brightness(0.95);
+      mix-blend-mode: screen;
+      background: #000000;
     }
 
     .touch-overlay {
@@ -312,6 +355,108 @@
       height: 60px;
       z-index: 10;
       background: transparent;
+    }
+
+    /* =========================================================
+       FULLSCREEN PREV / NEXT & OVER-PREV ZOOM CONTROLS
+       ========================================================= */
+    .fs-nav-btn {
+      display: none;
+      position: absolute;
+      bottom: 18px;
+      z-index: 70;
+      background: rgba(22, 27, 34, 0.9);
+      color: #f0f6fc;
+      border: 1px solid #388bfd66;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 8px 15px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8), 0 0 10px rgba(88, 166, 255, 0.2);
+      transition: all 0.15s ease;
+      letter-spacing: 0.3px;
+    }
+
+    .fs-nav-btn:hover:not(:disabled) {
+      background: #21262d;
+      border-color: #58a6ff;
+      color: #58a6ff;
+      transform: translateY(-2px);
+    }
+
+    .fs-nav-btn:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .fs-nav-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      pointer-events: none;
+      border-color: #30363d;
+    }
+
+    .fs-nav-prev {
+      left: 18px;
+    }
+
+    .fs-nav-next {
+      right: 18px;
+    }
+
+    /* Floating Zoom Controls Above Prev Button in Fullscreen */
+    .fs-zoom-stack {
+      display: none;
+      position: absolute;
+      bottom: 66px;
+      left: 18px;
+      z-index: 70;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .fs-zoom-btn {
+      background: rgba(22, 27, 34, 0.9);
+      color: #f0f6fc;
+      border: 1px solid #388bfd66;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
+      transition: all 0.15s ease;
+    }
+
+    .fs-zoom-btn:hover {
+      background: #21262d;
+      border-color: #58a6ff;
+      color: #58a6ff;
+      transform: scale(1.06);
+    }
+
+    .fs-zoom-btn:active {
+      transform: scale(0.96);
+    }
+
+    /* Reveal Controls ONLY when Fullscreen is Active */
+    .viewer-wrapper:fullscreen .fs-nav-btn,
+    .viewer-wrapper:fullscreen .fs-zoom-stack,
+    .viewer-wrapper:-webkit-full-screen .fs-nav-btn,
+    .viewer-wrapper:-webkit-full-screen .fs-zoom-stack,
+    .viewer-wrapper.fullscreen-mode .fs-nav-btn,
+    .viewer-wrapper.fullscreen-mode .fs-zoom-stack {
+      display: flex;
     }
 
     /* =========================================================
@@ -597,10 +742,12 @@
   <div class="watermark">⚡ Powered by 𓊈 ꕶ𝐚𐍄ꪗ𝓪𝓂 𓊉 🚩</div>
 
   <!-- Top Sticky PDF Viewer (65vh, Max Width with Pinch Zoom) -->
-  <div class="viewer-wrapper">
-    <div class="viewer-header">
+  <div class="viewer-wrapper" id="viewerWrapper">
+    <div class="viewer-header" id="viewerHeader">
       <span id="viewingTitle">PDF Preview</span>
       <div class="zoom-toolbar">
+        <button class="zoom-btn" id="btnThemeToggle" title="🌛 Dark Mode / ☀️ Normal Mode">🌛/☀️</button>
+        <button class="zoom-btn" id="btnFullscreen" title="Fullscreen (Click / Double Tap)">⛶</button>
         <button class="zoom-btn" id="btnZoomOut" title="Zoom Out">−</button>
         <span class="zoom-level" id="zoomDisplay">100%</span>
         <button class="zoom-btn" id="btnZoomIn" title="Zoom In">+</button>
@@ -616,6 +763,17 @@
         <div class="touch-overlay" id="touchOverlay"></div>
         <iframe id="pdfFrame" src="" style="display: none;"></iframe>
       </div>
+
+      <!-- Floating Zoom Controls Directly Above Prev Button in Fullscreen -->
+      <div class="fs-zoom-stack">
+        <button class="fs-zoom-btn" id="btnFsZoomIn" title="Zoom In">+</button>
+        <button class="fs-zoom-btn" id="btnFsZoomReset" title="Reset Zoom">↺</button>
+        <button class="fs-zoom-btn" id="btnFsZoomOut" title="Zoom Out">−</button>
+      </div>
+
+      <!-- Fullscreen Navigation Buttons -->
+      <button class="fs-nav-btn fs-nav-prev" id="btnPrevPdf" title="Previous PDF">◀ Prev PDF</button>
+      <button class="fs-nav-btn fs-nav-next" id="btnNextPdf" title="Next PDF">Next PDF ▶</button>
     </div>
   </div>
 
@@ -692,8 +850,105 @@
     const iframe = document.getElementById('pdfFrame');
     const placeholder = document.getElementById('placeholder');
     const viewingTitle = document.getElementById('viewingTitle');
+    const btnThemeToggle = document.getElementById('btnThemeToggle');
+    const btnFullscreen = document.getElementById('btnFullscreen');
+    const viewerWrapper = document.getElementById('viewerWrapper');
+    const viewerHeader = document.getElementById('viewerHeader');
+    const btnPrevPdf = document.getElementById('btnPrevPdf');
+    const btnNextPdf = document.getElementById('btnNextPdf');
+    const btnFsZoomIn = document.getElementById('btnFsZoomIn');
+    const btnFsZoomOut = document.getElementById('btnFsZoomOut');
+    const btnFsZoomReset = document.getElementById('btnFsZoomReset');
 
-    // Build Set List
+    let isPdfDarkMode = false;
+    let allDocumentsList = [];
+    let currentDocIndex = -1;
+
+    // Dark / Light Mode Toggle for PDF
+    btnThemeToggle.addEventListener('click', () => {
+      isPdfDarkMode = !isPdfDarkMode;
+      if (isPdfDarkMode) {
+        iframe.classList.add('pdf-dark-mode');
+        viewerWrapper.classList.add('dark-pdf-active');
+        btnThemeToggle.classList.add('active-btn');
+      } else {
+        iframe.classList.remove('pdf-dark-mode');
+        viewerWrapper.classList.remove('dark-pdf-active');
+        btnThemeToggle.classList.remove('active-btn');
+      }
+    });
+
+    // Fullscreen Toggle Logic
+    function isCurrentlyFullscreen() {
+      return !!(
+        document.fullscreenElement ||
+        document.webkitFullscreenElement ||
+        viewerWrapper.classList.contains('fullscreen-mode')
+      );
+    }
+
+    function toggleFullscreen() {
+      const active = isCurrentlyFullscreen();
+
+      if (!active) {
+        if (viewerWrapper.requestFullscreen) {
+          viewerWrapper.requestFullscreen().catch(() => {
+            viewerWrapper.classList.add('fullscreen-mode');
+          });
+        } else if (viewerWrapper.webkitRequestFullscreen) {
+          viewerWrapper.webkitRequestFullscreen();
+        } else {
+          viewerWrapper.classList.add('fullscreen-mode');
+        }
+        btnFullscreen.classList.add('active-btn');
+      } else {
+        if (document.exitFullscreen && document.fullscreenElement) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen && document.webkitFullscreenElement) {
+          document.webkitExitFullscreen();
+        }
+        viewerWrapper.classList.remove('fullscreen-mode');
+        btnFullscreen.classList.remove('active-btn');
+      }
+      updateNavButtons();
+    }
+
+    // Sync fullscreen state on change
+    ['fullscreenchange', 'webkitfullscreenchange'].forEach(evt => {
+      document.addEventListener(evt, () => {
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+          viewerWrapper.classList.remove('fullscreen-mode');
+          btnFullscreen.classList.remove('active-btn');
+        } else {
+          btnFullscreen.classList.add('active-btn');
+        }
+        updateNavButtons();
+      });
+    });
+
+    // Fullscreen Button Click
+    btnFullscreen.addEventListener('click', toggleFullscreen);
+
+    // Double Click / Double Tap on Viewer Header to Toggle Fullscreen
+    viewerHeader.addEventListener('dblclick', (e) => {
+      if (e.target.tagName !== 'BUTTON') {
+        toggleFullscreen();
+      }
+    });
+
+    let lastHeaderTap = 0;
+    viewerHeader.addEventListener('touchend', (e) => {
+      if (e.target.tagName === 'BUTTON') return;
+      const now = new Date().getTime();
+      if (now - lastHeaderTap < 320 && now - lastHeaderTap > 0) {
+        toggleFullscreen();
+        lastHeaderTap = 0;
+      } else {
+        lastHeaderTap = now;
+      }
+    });
+
+    // Flatten data & Build Set List
     setsData.forEach(item => {
       const padNum = String(item.set).padStart(3, '0');
       
@@ -716,14 +971,23 @@
       const dropdown = document.createElement('div');
       dropdown.className = 'set-dropdown';
 
-      dropdown.appendChild(createLink(`Homework ${item.set}`, item.hw, 'hw'));
+      // HW
+      const hwLink = createLink(`Homework ${item.set}`, item.hw, 'hw', item.set);
+      dropdown.appendChild(hwLink.element);
+      allDocumentsList.push(hwLink.data);
 
+      // Test Series
       item.ts.forEach(([title, id]) => {
-        dropdown.appendChild(createLink(title, id, 'ts'));
+        const tsLink = createLink(title, id, 'ts', item.set);
+        dropdown.appendChild(tsLink.element);
+        allDocumentsList.push(tsLink.data);
       });
 
+      // Solutions
       item.sol.forEach(([title, id]) => {
-        dropdown.appendChild(createLink(title, id, 'sol'));
+        const solLink = createLink(title, id, 'sol', item.set);
+        dropdown.appendChild(solLink.element);
+        allDocumentsList.push(solLink.data);
       });
 
       card.appendChild(header);
@@ -731,7 +995,7 @@
       container.appendChild(card);
     });
 
-    function createLink(title, id, type) {
+    function createLink(title, id, type, setNum) {
       const link = document.createElement('div');
       link.className = 'doc-link';
 
@@ -745,36 +1009,84 @@
         <span>${title}</span>
       `;
 
-      link.onclick = (e) => {
-        e.stopPropagation();
-        document.querySelectorAll('.doc-link').forEach(l => l.classList.remove('active-item'));
-        link.classList.add('active-item');
-        loadPdf(title, id);
+      const docItem = {
+        title,
+        id,
+        setNum,
+        element: link
       };
 
-      return link;
+      link.onclick = (e) => {
+        e.stopPropagation();
+        const foundIndex = allDocumentsList.findIndex(d => d.id === id && d.title === title);
+        if (foundIndex !== -1) {
+          loadPdfByIndex(foundIndex);
+        }
+      };
+
+      return { element: link, data: docItem };
     }
 
-    function toggleCard(setNum) {
+    function toggleCard(setNum, forceOpen = false) {
       const allCards = document.querySelectorAll('.set-card');
       const targetCard = document.getElementById(`card-set-${setNum}`);
+      if (!targetCard) return;
+
       const isAlreadyActive = targetCard.classList.contains('active');
 
       allCards.forEach(c => c.classList.remove('active'));
 
-      if (!isAlreadyActive) {
+      if (forceOpen || !isAlreadyActive) {
         targetCard.classList.add('active');
       }
     }
 
-    function loadPdf(title, fileId) {
-      viewingTitle.innerText = `📄 ${title}`;
+    function updateNavButtons() {
+      btnPrevPdf.disabled = currentDocIndex <= 0;
+      btnNextPdf.disabled = currentDocIndex >= allDocumentsList.length - 1 || currentDocIndex === -1;
+    }
+
+    function loadPdfByIndex(index) {
+      if (index < 0 || index >= allDocumentsList.length) return;
+      currentDocIndex = index;
+      const doc = allDocumentsList[index];
+
+      // Update active styling
+      document.querySelectorAll('.doc-link').forEach(l => l.classList.remove('active-item'));
+      if (doc.element) {
+        doc.element.classList.add('active-item');
+      }
+
+      // Open parent card
+      toggleCard(doc.setNum, true);
+
+      // Load PDF
+      viewingTitle.innerText = `📄 ${doc.title}`;
       placeholder.style.display = 'none';
       iframe.style.display = 'block';
-      iframe.src = `https://drive.google.com/file/d/${fileId}/preview`;
+      iframe.src = `https://drive.google.com/file/d/${doc.id}/preview`;
       resetZoom();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      updateNavButtons();
     }
+
+    // Previous & Next Button Click Listeners
+    btnPrevPdf.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (currentDocIndex > 0) {
+        loadPdfByIndex(currentDocIndex - 1);
+      }
+    });
+
+    btnNextPdf.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (currentDocIndex === -1) {
+        loadPdfByIndex(0);
+      } else if (currentDocIndex < allDocumentsList.length - 1) {
+        loadPdfByIndex(currentDocIndex + 1);
+      }
+    });
+
+    updateNavButtons();
 
     /* -------------------------------------------------------------
        PINCH TO ZOOM & PAN LOGIC
@@ -908,9 +1220,24 @@
       }
     });
 
+    // Standard Toolbar Zoom Buttons
     document.getElementById('btnZoomIn').addEventListener('click', () => setZoom(scale + 0.3));
     document.getElementById('btnZoomOut').addEventListener('click', () => setZoom(scale - 0.3));
     document.getElementById('btnZoomReset').addEventListener('click', () => resetZoom());
+
+    // Fullscreen Overlay Zoom Buttons (Over Prev Button)
+    btnFsZoomIn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setZoom(scale + 0.3);
+    });
+    btnFsZoomOut.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setZoom(scale - 0.3);
+    });
+    btnFsZoomReset.addEventListener('click', (e) => {
+      e.stopPropagation();
+      resetZoom();
+    });
 
     // Protection shortcut blockers
     document.addEventListener('keydown', function (e) {
